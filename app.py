@@ -1,7 +1,6 @@
 import os
+import sqlite3
 from flask import Flask, render_template, request, redirect, url_for, session, flash
-import mysql.connector
-from mysql.connector import Error
 from werkzeug.security import generate_password_hash, check_password_hash
 from config import active_config
 
@@ -13,42 +12,66 @@ app.config.from_object(active_config)
 # ==========================================
 def get_db_connection():
     try:
-        connection = mysql.connector.connect(
-            host=app.config.get('MYSQL_HOST', 'localhost'),
-            user=app.config.get('MYSQL_USER', 'root'),
-            password=app.config.get('MYSQL_PASSWORD', 'Jantyking@1'),
-            database=app.config.get('MYSQL_DATABASE', 'edutrackx'),
-            port=app.config.get('MYSQL_PORT', 3306)
-        )
+        # SQLite uses a local file instead of a server
+        connection = sqlite3.connect('database.db', check_same_thread=False)
+        # This makes the cursor return dictionary-like row objects
+        connection.row_factory = sqlite3.Row
         return connection
-    except Error as e:
-        print(f"Error connecting to MySQL Database: {e}")
+    except Exception as e:
+        print(f"Error connecting to Database: {e}")
         return None
 
 # ==========================================
-# Initialize Admin (Run once on startup)
+# Initialize Database & Admin
 # ==========================================
 def init_db():
     conn = get_db_connection()
     if conn:
         cursor = conn.cursor()
+        
+        # Create admin table
+        cursor.execute('''
+        CREATE TABLE IF NOT EXISTS admin (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            username TEXT NOT NULL UNIQUE,
+            password TEXT NOT NULL,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+        ''')
+        
+        # Create students table
+        cursor.execute('''
+        CREATE TABLE IF NOT EXISTS students (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            name TEXT NOT NULL,
+            roll_no TEXT NOT NULL UNIQUE,
+            class TEXT NOT NULL,
+            password TEXT NOT NULL,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+        ''')
+        
+        # Create marks table
+        cursor.execute('''
+        CREATE TABLE IF NOT EXISTS marks (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            student_id INTEGER NOT NULL,
+            subject TEXT NOT NULL,
+            marks INTEGER NOT NULL CHECK (marks >= 0 AND marks <= 100),
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (student_id) REFERENCES students(id) ON DELETE CASCADE,
+            UNIQUE(student_id, subject)
+        )
+        ''')
+
+        # Insert default admin if not exists
         cursor.execute("SELECT * FROM admin WHERE username = 'admin'")
         admin = cursor.fetchone()
         if not admin:
             hashed_pw = generate_password_hash('admin123')
-            cursor.execute("INSERT INTO admin (username, password) VALUES (%s, %s)", ('admin', hashed_pw))
+            cursor.execute("INSERT INTO admin (username, password) VALUES (?, ?)", ('admin', hashed_pw))
             conn.commit()
             print("Default admin created: admin / admin123")
-        
-        # Auto-migrate students table to include password
-        try:
-            cursor.execute("SHOW COLUMNS FROM students LIKE 'password'")
-            if not cursor.fetchone():
-                cursor.execute("ALTER TABLE students ADD COLUMN password VARCHAR(255) NOT NULL DEFAULT ''")
-                conn.commit()
-                print("Added password column to students table")
-        except Exception as e:
-            print(f"Migration error: {e}")
             
         cursor.close()
         conn.close()
@@ -79,8 +102,8 @@ def admin_login():
             flash('Database connection failed.', 'error')
             return render_template('login.html')
 
-        cursor = conn.cursor(dictionary=True)
-        cursor.execute("SELECT * FROM admin WHERE username = %s", (username,))
+        cursor = conn.cursor()
+        cursor.execute("SELECT * FROM admin WHERE username = ?", (username,))
         admin = cursor.fetchone()
         cursor.close()
         conn.close()
@@ -109,7 +132,7 @@ def dashboard():
     conn = get_db_connection()
     stats = {'total_students': 0, 'recent_students': []}
     if conn:
-        cursor = conn.cursor(dictionary=True)
+        cursor = conn.cursor()
         cursor.execute("SELECT COUNT(*) as count FROM students")
         stats['total_students'] = cursor.fetchone()['count']
         
@@ -139,12 +162,12 @@ def add_student():
             cursor = conn.cursor()
             try:
                 hashed_pw = generate_password_hash(roll_no)
-                cursor.execute("INSERT INTO students (name, roll_no, class, password) VALUES (%s, %s, %s, %s)", 
+                cursor.execute("INSERT INTO students (name, roll_no, class, password) VALUES (?, ?, ?, ?)", 
                                (name, roll_no, student_class, hashed_pw))
                 conn.commit()
                 flash('Student added successfully!', 'success')
                 return redirect(url_for('dashboard'))
-            except mysql.connector.IntegrityError:
+            except sqlite3.IntegrityError:
                 flash(f'Roll number {roll_no} already exists.', 'error')
             except Exception as e:
                 flash(f'Error adding student: {e}', 'error')
@@ -162,7 +185,7 @@ def add_marks():
     conn = get_db_connection()
     students = []
     if conn:
-        cursor = conn.cursor(dictionary=True)
+        cursor = conn.cursor()
         cursor.execute("SELECT id, roll_no, name FROM students ORDER BY roll_no")
         students = cursor.fetchall()
         cursor.close()
@@ -188,21 +211,21 @@ def add_marks():
 
         conn = get_db_connection()
         if conn:
-            cursor = conn.cursor(dictionary=True)
+            cursor = conn.cursor()
             try:
-                cursor.execute("SELECT id FROM students WHERE roll_no = %s", (roll_no,))
+                cursor.execute("SELECT id FROM students WHERE roll_no = ?", (roll_no,))
                 student = cursor.fetchone()
                 if not student:
                     flash(f'Student with Roll Number {roll_no} not found.', 'error')
                     return render_template('add_marks.html', students=students)
                 
                 student_id = student['id']
-                cursor.execute("INSERT INTO marks (student_id, subject, marks) VALUES (%s, %s, %s)",
+                cursor.execute("INSERT INTO marks (student_id, subject, marks) VALUES (?, ?, ?)",
                                (student_id, subject, marks))
                 conn.commit()
                 flash('Marks added successfully!', 'success')
                 return redirect(url_for('dashboard'))
-            except mysql.connector.IntegrityError:
+            except sqlite3.IntegrityError:
                 flash(f'Marks for subject {subject} already exist for this student.', 'error')
             except Exception as e:
                 flash(f'Error adding marks: {e}', 'error')
@@ -233,10 +256,10 @@ def result(roll_no):
         flash('Database connection failed.', 'error')
         return redirect(url_for('dashboard'))
 
-    cursor = conn.cursor(dictionary=True)
+    cursor = conn.cursor()
     
     # Get student info
-    cursor.execute("SELECT * FROM students WHERE roll_no = %s", (roll_no,))
+    cursor.execute("SELECT * FROM students WHERE roll_no = ?", (roll_no,))
     student = cursor.fetchone()
     
     if not student:
@@ -246,7 +269,7 @@ def result(roll_no):
         return redirect(url_for('dashboard'))
 
     # Get student marks
-    cursor.execute("SELECT subject, marks FROM marks WHERE student_id = %s", (student['id'],))
+    cursor.execute("SELECT subject, marks FROM marks WHERE student_id = ?", (student['id'],))
     marks = cursor.fetchall()
     
     cursor.close()
@@ -284,8 +307,8 @@ def api_student_login():
     if not conn:
         return {'success': False, 'message': 'Database connection failed'}, 500
         
-    cursor = conn.cursor(dictionary=True)
-    cursor.execute("SELECT * FROM students WHERE roll_no = %s", (enrollment,))
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM students WHERE roll_no = ?", (enrollment,))
     student = cursor.fetchone()
     cursor.close()
     conn.close()
