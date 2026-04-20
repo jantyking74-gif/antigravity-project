@@ -1,6 +1,4 @@
-import os
 import mysql.connector
-import mysql.connector.cursor
 from flask import Flask, render_template, request, redirect, url_for, session, flash
 from werkzeug.security import generate_password_hash, check_password_hash
 from config import active_config
@@ -18,11 +16,12 @@ def get_db_connection():
             user=active_config.MYSQL_USER,
             password=active_config.MYSQL_PASSWORD,
             database=active_config.MYSQL_DATABASE,
-            port=active_config.MYSQL_PORT
+            port=active_config.MYSQL_PORT,
+            autocommit=True  # Ensure changes are saved immediately
         )
         return connection
     except Exception as e:
-        print(f"Error connecting to Database: {e}")
+        print(f"CRITICAL: Database connection failed! {e}")
         return None
 
 # ==========================================
