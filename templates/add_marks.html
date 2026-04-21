@@ -36,6 +36,16 @@
       <div class="input-glow"></div>
     </div>
 
+    <div class="input-group">
+      <select name="semester" id="semester" class="form-input" required style="padding-left: 20px; background: var(--input-bg); color: var(--text-primary);">
+        {% for s in range(1, 9) %}
+          <option value="{{ s }}">Semester {{ s }}</option>
+        {% endfor %}
+      </select>
+      <label for="semester" class="form-label" style="left: 20px; transform: translateY(-22px) scale(0.85); color: var(--accent);">Target Semester</label>
+      <div class="input-glow"></div>
+    </div>
+
     <button type="submit" class="sign-in-btn" style="margin-top: 10px;">
       <span class="btn-text">Save Marks</span>
       <div class="btn-glow"></div>

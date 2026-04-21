@@ -55,7 +55,7 @@
     </div>
     <div class="profile-info-item">
       <label>Member Since</label>
-      <span>{{ student.created_at.strftime('%b %d, %Y') if student.created_at else 'N/A' }}</span>
+      <span>{{ student.created_at[:10] if student.created_at else 'N/A' }}</span>
     </div>
   </div>
 </div>

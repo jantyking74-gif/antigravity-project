@@ -144,6 +144,10 @@ def init_db():
             cursor.execute("INSERT INTO admin (username, password) VALUES (?, ?)", ('admin', hashed_pw))
             conn.commit()
             print("Default admin created: admin / admin123")
+        
+        # Ensure marks table has correct unique constraint (if possible)
+        # Note: SQLite doesn't support ALTER TABLE for constraints. 
+        # We'll just ensure the semester column is there and use logic in code.
             
         cursor.close()
         conn.close()
@@ -312,6 +316,7 @@ def add_marks():
         roll_no = request.form.get('roll_no')
         subject = request.form.get('subject')
         marks = request.form.get('marks')
+        semester = request.form.get('semester', type=int) or 1
 
         if not roll_no or not subject or not marks:
             flash('All fields are required.', 'error')
@@ -337,8 +342,8 @@ def add_marks():
                     return render_template('add_marks.html', students=students)
                 
                 student_id = student['id']
-                cursor.execute("INSERT INTO marks (student_id, subject, marks) VALUES (?, ?, ?)",
-                               (student_id, subject, marks))
+                cursor.execute("INSERT INTO marks (student_id, subject, marks, semester) VALUES (?, ?, ?, ?)",
+                               (student_id, subject, marks, semester))
                 conn.commit()
                 flash('Marks added successfully!', 'success')
                 return redirect(url_for('dashboard'))
@@ -378,8 +383,8 @@ def result(roll_no):
         flash(f'Student with Roll Number {roll_no} not found.', 'error')
         return redirect(url_for('dashboard'))
 
-    # Get student marks
-    cursor.execute("SELECT subject, marks FROM marks WHERE student_id = ?", (student['id'],))
+    # Get student marks for their current semester or all marks
+    cursor.execute("SELECT subject, marks, semester FROM marks WHERE student_id = ? ORDER BY semester DESC", (student['id'],))
     marks = cursor.fetchall()
     
     cursor.close()
@@ -670,7 +675,8 @@ def student_result_page():
     marks = []
     if conn:
         cursor = conn.cursor()
-        cursor.execute("SELECT subject, marks FROM marks WHERE student_id = ?", (student['id'],))
+        cursor.execute("SELECT subject, marks, semester FROM marks WHERE student_id = ? AND semester = ?", 
+                       (student['id'], current_semester))
         marks = cursor.fetchall()
         cursor.close()
         conn.close()
