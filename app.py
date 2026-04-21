@@ -246,13 +246,13 @@ def add_marks():
 
 def calculate_grade(percentage):
     if percentage >= 90:
-        return 'A', '#00ffc8' # Greenish
+        return 'A', '#00ffc8', '#00ffc855', '#00ffc888' # Greenish
     elif percentage >= 75:
-        return 'B', '#00c6ff' # Cyan
+        return 'B', '#00c6ff', '#00c6ff55', '#00c6ff88' # Cyan
     elif percentage >= 50:
-        return 'C', '#ffaa00' # Yellow
+        return 'C', '#ffaa00', '#ffaa0055', '#ffaa0088' # Yellow
     else:
-        return 'Fail', '#ff4466' # Red
+        return 'Fail', '#ff4466', '#ff446655', '#ff446688' # Red
 
 @app.route('/result/<roll_no>')
 def result(roll_no):
@@ -286,7 +286,7 @@ def result(roll_no):
 
     total_marks = 0
     percentage = 0
-    grade = ('N/A', '#fff')
+    grade = ('N/A', '#ffffff', '#ffffff55', '#ffffff88')
     
     if marks:
         total_marks = sum(item['marks'] for item in marks)
