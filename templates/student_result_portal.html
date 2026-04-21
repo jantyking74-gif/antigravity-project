@@ -1,0 +1,86 @@
+{% extends 'student_portal_base.html' %}
+{% block title %}EduTrackX — Exam Result{% endblock %}
+
+{% block content %}
+<div class="portal-header">
+  <div>
+    <h1>Exam Results</h1>
+    <p>Your academic performance for Semester {{ current_semester }}</p>
+  </div>
+</div>
+
+{% if marks %}
+<!-- Grade Summary -->
+<div class="stats-grid" style="margin-bottom: 24px;">
+  <div class="portal-card" style="animation-delay: 0.1s;">
+    <h3>Total Marks</h3>
+    <p class="card-value">{{ total_marks }} / {{ marks|length * 100 }}</p>
+  </div>
+  <div class="portal-card" style="animation-delay: 0.2s;">
+    <h3>Percentage</h3>
+    <p class="card-value">{{ percentage }}%</p>
+  </div>
+  <div class="portal-card" id="grade-card" style="animation-delay: 0.3s;">
+    <h3>Grade</h3>
+    <p class="card-value" id="grade-value">{{ grade_letter }}</p>
+  </div>
+</div>
+
+<!-- Marks Table -->
+<div class="portal-card">
+  <h3 style="font-size: 16px; font-weight: 600; color: var(--text-secondary); margin-bottom: 16px;">Subject-wise Marks</h3>
+  <table class="portal-table">
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>Subject</th>
+        <th style="text-align: right;">Marks</th>
+        <th style="text-align: right;">Maximum</th>
+        <th style="text-align: right;">Status</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for m in marks %}
+      <tr>
+        <td>{{ loop.index }}</td>
+        <td>{{ m.subject }}</td>
+        <td style="text-align: right; font-weight: 600;">{{ m.marks }}</td>
+        <td style="text-align: right; color: var(--text-muted);">100</td>
+        <td style="text-align: right;">
+          {% if m.marks >= 40 %}
+            <span class="status-badge approved">Pass</span>
+          {% else %}
+            <span class="status-badge rejected">Fail</span>
+          {% endif %}
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+{% else %}
+<div class="portal-card" style="text-align: center; padding: 48px 28px;">
+  <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" stroke-width="1.5" stroke-linecap="round" style="margin-bottom: 16px;">
+    <path d="M22 12h-4l-3 9L9 3l-3 9H2"/>
+  </svg>
+  <h3 style="color: var(--text-primary); font-size: 18px; font-weight: 600; margin-bottom: 8px;">No Results Available</h3>
+  <p style="color: var(--text-muted); font-size: 13px;">
+    Results for Semester {{ current_semester }} have not been published yet.
+  </p>
+</div>
+{% endif %}
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    var gradeColor = "{{ grade_color }}";
+    var gradeCard = document.getElementById('grade-card');
+    var gradeValue = document.getElementById('grade-value');
+    if (gradeCard && gradeColor && gradeColor !== '#fff') {
+      gradeCard.style.borderColor = gradeColor + '44';
+      gradeValue.style.color = gradeColor;
+      gradeValue.style.textShadow = '0 0 10px ' + gradeColor + '66';
+    }
+  });
+</script>
+{% endblock %}

@@ -1,0 +1,77 @@
+{% extends 'student_portal_base.html' %}
+{% block title %}EduTrackX — Exam Form Fill-up{% endblock %}
+
+{% block content %}
+<div class="portal-header">
+  <div>
+    <h1>Exam Form Fill-up</h1>
+    <p>Submit your examination enrollment form for Semester {{ current_semester }}</p>
+  </div>
+</div>
+
+{% if existing_form %}
+<!-- Already submitted -->
+<div class="portal-card" style="margin-bottom: 24px;">
+  <div style="text-align: center; padding: 20px 0;">
+    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#00ffc8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-bottom: 16px;">
+      <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/>
+    </svg>
+    <h3 style="color: var(--text-primary); font-size: 18px; font-weight: 600; margin-bottom: 8px;">Form Already Submitted</h3>
+    <p style="color: var(--text-muted); font-size: 13px; margin-bottom: 16px;">
+      You have already submitted the exam form for Semester {{ current_semester }}.
+    </p>
+    <span class="status-badge {{ existing_form.status }}">{{ existing_form.status | capitalize }}</span>
+  </div>
+</div>
+
+<!-- Submitted Subjects -->
+<div class="portal-card">
+  <h3 style="font-size: 16px; font-weight: 600; color: var(--text-secondary); margin-bottom: 16px;">Enrolled Subjects</h3>
+  <table class="portal-table">
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>Subject</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for subj in form_subjects %}
+      <tr>
+        <td>{{ loop.index }}</td>
+        <td>{{ subj.subject_name }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+{% else %}
+<!-- New Form -->
+<div class="portal-card">
+  <h3 style="font-size: 16px; font-weight: 600; color: var(--text-secondary); margin-bottom: 20px;">Select Subjects</h3>
+  <form class="portal-form" method="POST" action="{{ url_for('student_form_fillup') }}">
+    <input type="hidden" name="semester" value="{{ current_semester }}">
+
+    <div class="subjects-grid">
+      {% for subj in available_subjects %}
+      <label class="subject-check">
+        <input type="checkbox" name="subjects" value="{{ subj }}">
+        {{ subj }}
+      </label>
+      {% endfor %}
+    </div>
+
+    <div class="form-group full-width" style="margin-top: 16px;">
+      <label class="form-check">
+        <input type="checkbox" name="declaration" required>
+        I declare that the information provided is correct and I agree to the examination rules.
+      </label>
+    </div>
+
+    <div style="display: flex; gap: 12px; margin-top: 8px;">
+      <button type="submit" class="portal-btn">Submit Form</button>
+    </div>
+  </form>
+</div>
+{% endif %}
+{% endblock %}

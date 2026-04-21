@@ -1,0 +1,101 @@
+{% extends 'student_portal_base.html' %}
+{% block title %}EduTrackX — Admit Card{% endblock %}
+
+{% block content %}
+<div class="portal-header">
+  <div>
+    <h1>Admit Card</h1>
+    <p>Your examination admit card for Semester {{ current_semester }}</p>
+  </div>
+  {% if admit_card %}
+  <button onclick="window.print()" class="portal-btn">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+    Print
+  </button>
+  {% endif %}
+</div>
+
+{% if admit_card %}
+<div class="admit-card-container">
+  <div class="admit-header">
+    <h2><span class="brand-edu">Edu</span><span class="brand-track">Track</span><span class="brand-x">X</span> University</h2>
+    <p>Examination Admit Card — Semester {{ current_semester }}</p>
+  </div>
+
+  <div class="admit-info-grid">
+    <div class="admit-info-item">
+      <label>Student Name</label>
+      <span>{{ student.name }}</span>
+    </div>
+    <div class="admit-info-item">
+      <label>Roll Number</label>
+      <span>{{ student.roll_no }}</span>
+    </div>
+    <div class="admit-info-item">
+      <label>Class / Section</label>
+      <span>{{ student.class }}</span>
+    </div>
+    <div class="admit-info-item">
+      <label>Semester</label>
+      <span>Semester {{ current_semester }}</span>
+    </div>
+    <div class="admit-info-item">
+      <label>Exam Session</label>
+      <span>2026</span>
+    </div>
+    <div class="admit-info-item">
+      <label>Form Status</label>
+      <span class="status-badge approved">Approved</span>
+    </div>
+  </div>
+
+  <!-- Subjects Table -->
+  <h3 style="font-size: 14px; font-weight: 600; color: var(--text-secondary); margin-bottom: 12px;">Enrolled Subjects</h3>
+  <table class="portal-table" style="margin-bottom: 24px;">
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>Subject</th>
+        <th>Date</th>
+        <th>Time</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for subj in subjects %}
+      <tr>
+        <td>{{ loop.index }}</td>
+        <td>{{ subj.subject_name }}</td>
+        <td>{{ subj.exam_date or 'TBA' }}</td>
+        <td>10:00 AM - 1:00 PM</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <div style="border-top: 1px dashed rgba(255,255,255,0.15); padding-top: 16px;">
+    <p style="font-size: 11px; color: var(--text-muted); line-height: 1.8;">
+      <strong style="color: var(--text-secondary);">Important Instructions:</strong><br>
+      1. Carry this admit card and a valid photo ID to the examination hall.<br>
+      2. Report at least 30 minutes before the scheduled time.<br>
+      3. Electronic devices are not permitted inside the examination hall.
+    </p>
+  </div>
+
+  <div class="admit-stamp">
+    <span>VERIFIED</span>
+  </div>
+</div>
+
+{% else %}
+<div class="portal-card" style="text-align: center; padding: 48px 28px;">
+  <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" stroke-width="1.5" stroke-linecap="round" style="margin-bottom: 16px;">
+    <rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/>
+  </svg>
+  <h3 style="color: var(--text-primary); font-size: 18px; font-weight: 600; margin-bottom: 8px;">No Admit Card Available</h3>
+  <p style="color: var(--text-muted); font-size: 13px; margin-bottom: 20px;">
+    Please submit your exam form first to generate your admit card.
+  </p>
+  <a href="{{ url_for('student_form_fillup') }}" class="portal-btn">Fill Exam Form</a>
+</div>
+{% endif %}
+{% endblock %}

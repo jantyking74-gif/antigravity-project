@@ -1,0 +1,37 @@
+{% extends 'student_portal_base.html' %}
+{% block title %}EduTrackX — Select Semester{% endblock %}
+
+{% block content %}
+<div class="portal-header">
+  <div>
+    <h1>Select Semester</h1>
+    <p>Choose your active semester to view relevant data</p>
+  </div>
+</div>
+
+<div class="portal-card" style="margin-bottom: 24px;">
+  <h3 style="font-size: 16px; font-weight: 600; color: var(--text-secondary); margin-bottom: 20px;">
+    Current Semester: <span style="color: var(--accent);">Semester {{ current_semester }}</span>
+  </h3>
+
+  <div class="semester-grid">
+    {% for sem in range(1, 9) %}
+    <a href="{{ url_for('student_semester_page') }}?semester={{ sem }}" class="semester-card {% if sem == current_semester %}active{% endif %}">
+      <h4>{{ sem }}</h4>
+      <p>Semester {{ sem }}</p>
+      {% if sem == current_semester %}
+      <span style="display: inline-block; margin-top: 8px; font-size: 10px; color: var(--accent); font-weight: 600; letter-spacing: 1px;">ACTIVE</span>
+      {% endif %}
+    </a>
+    {% endfor %}
+  </div>
+</div>
+
+<div class="portal-card">
+  <h3 style="font-size: 16px; font-weight: 600; color: var(--text-secondary); margin-bottom: 16px;">About Semesters</h3>
+  <p style="color: var(--text-muted); font-size: 13px; line-height: 1.8;">
+    Select your current active semester to view semester-specific results, admit cards, and form fill-up options.
+    Your selected semester will be saved and applied across all sections of the portal.
+  </p>
+</div>
+{% endblock %}

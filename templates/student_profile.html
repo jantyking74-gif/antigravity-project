@@ -1,0 +1,92 @@
+{% extends 'student_portal_base.html' %}
+{% block title %}EduTrackX — My Profile{% endblock %}
+
+{% block content %}
+<div class="portal-header">
+  <div>
+    <h1>My Profile</h1>
+    <p>View and update your personal information</p>
+  </div>
+</div>
+
+<!-- Profile Header Card -->
+<div class="portal-card" style="margin-bottom: 24px;">
+  <div class="profile-header">
+    <div class="profile-avatar-lg">{{ student.name[0] | upper }}</div>
+    <div class="profile-details">
+      <h2>{{ student.name }}</h2>
+      <p>Roll No: {{ student.roll_no }} &middot; Class: {{ student.class }}</p>
+      <span class="profile-tag">Semester {{ student.current_semester or 1 }}</span>
+    </div>
+  </div>
+</div>
+
+<!-- Profile Info -->
+<div class="portal-card" style="margin-bottom: 24px;">
+  <h3 style="font-size: 16px; font-weight: 600; color: var(--text-secondary); margin-bottom: 20px;">Personal Information</h3>
+  <div class="profile-info-grid">
+    <div class="profile-info-item">
+      <label>Full Name</label>
+      <span>{{ student.name }}</span>
+    </div>
+    <div class="profile-info-item">
+      <label>Roll Number</label>
+      <span>{{ student.roll_no }}</span>
+    </div>
+    <div class="profile-info-item">
+      <label>Class / Section</label>
+      <span>{{ student.class }}</span>
+    </div>
+    <div class="profile-info-item">
+      <label>Current Semester</label>
+      <span>Semester {{ student.current_semester or 1 }}</span>
+    </div>
+    <div class="profile-info-item">
+      <label>Email</label>
+      <span>{{ student.email or 'Not provided' }}</span>
+    </div>
+    <div class="profile-info-item">
+      <label>Phone</label>
+      <span>{{ student.phone or 'Not provided' }}</span>
+    </div>
+    <div class="profile-info-item">
+      <label>Date of Birth</label>
+      <span>{{ student.dob or 'Not provided' }}</span>
+    </div>
+    <div class="profile-info-item">
+      <label>Member Since</label>
+      <span>{{ student.created_at.strftime('%b %d, %Y') if student.created_at else 'N/A' }}</span>
+    </div>
+  </div>
+</div>
+
+<!-- Edit Profile Form -->
+<div class="portal-card">
+  <h3 style="font-size: 16px; font-weight: 600; color: var(--text-secondary); margin-bottom: 20px;">Update Profile</h3>
+  <form class="portal-form" method="POST" action="{{ url_for('student_profile') }}">
+    <div class="form-row">
+      <div class="form-group">
+        <label for="email">Email Address</label>
+        <input type="email" name="email" id="email" value="{{ student.email or '' }}" placeholder="Enter your email">
+      </div>
+      <div class="form-group">
+        <label for="phone">Phone Number</label>
+        <input type="tel" name="phone" id="phone" value="{{ student.phone or '' }}" placeholder="Enter phone number">
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label for="dob">Date of Birth</label>
+        <input type="date" name="dob" id="dob" value="{{ student.dob or '' }}">
+      </div>
+      <div class="form-group">
+        <label for="address">Address</label>
+        <input type="text" name="address" id="address" value="{{ student.address or '' }}" placeholder="Enter your address">
+      </div>
+    </div>
+    <div style="display: flex; gap: 12px; margin-top: 8px;">
+      <button type="submit" class="portal-btn">Save Changes</button>
+    </div>
+  </form>
+</div>
+{% endblock %}

@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="EduTrackX Student Portal — Manage your academic journey.">
+  <title>{% block title %}EduTrackX — Student Portal{% endblock %}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/student_portal.css') }}">
+</head>
+<body>
+
+  <!-- Background -->
+  <canvas id="bg-canvas"></canvas>
+  <div class="floating-shapes" aria-hidden="true">
+    <div class="blob blob-1"></div>
+    <div class="blob blob-2"></div>
+    <div class="blob blob-3"></div>
+    <div class="glow-orb glow-orb-1"></div>
+    <div class="glow-orb glow-orb-2"></div>
+  </div>
+
+  <!-- Mobile Sidebar Toggle -->
+  <button class="sidebar-toggle" id="sidebar-toggle" aria-label="Toggle sidebar">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+  </button>
+
+  <div class="portal-wrapper">
+    <!-- Sidebar -->
+    <aside class="portal-sidebar" id="portal-sidebar">
+      <div class="sidebar-brand">
+        <h2><span class="brand-edu">Edu</span><span class="brand-track">Track</span><span class="brand-x">X</span></h2>
+        <p>Student Portal</p>
+      </div>
+
+      <div class="sidebar-user">
+        <div class="sidebar-avatar">{{ student.name[0] | upper if student else 'S' }}</div>
+        <div class="sidebar-user-info">
+          <h4>{{ student.name if student else 'Student' }}</h4>
+          <span>{{ student.roll_no if student else '' }}</span>
+        </div>
+      </div>
+
+      <nav class="sidebar-nav">
+        <span class="nav-label">Main</span>
+
+        <a href="{{ url_for('student_dashboard') }}" class="nav-link {% if active_page == 'dashboard' %}active{% endif %}" id="nav-dashboard">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="14" y="12" width="7" height="9" rx="1"/><rect x="3" y="16" width="7" height="5" rx="1"/></svg>
+          Dashboard
+        </a>
+
+        <a href="{{ url_for('student_profile') }}" class="nav-link {% if active_page == 'profile' %}active{% endif %}" id="nav-profile">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          View Profile
+        </a>
+
+        <span class="nav-label">Academics</span>
+
+        <a href="{{ url_for('student_semester_page') }}" class="nav-link {% if active_page == 'semester' %}active{% endif %}" id="nav-semester">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          Select Semester
+        </a>
+
+        <a href="{{ url_for('student_form_fillup') }}" class="nav-link {% if active_page == 'form' %}active{% endif %}" id="nav-form">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+          Form Fill-up
+        </a>
+
+        <a href="{{ url_for('student_admit_card') }}" class="nav-link {% if active_page == 'admit' %}active{% endif %}" id="nav-admit">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
+          Admit Card
+        </a>
+
+        <a href="{{ url_for('student_result_page') }}" class="nav-link {% if active_page == 'result' %}active{% endif %}" id="nav-result">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+          Exam Result
+        </a>
+
+        <a href="{{ url_for('student_migration') }}" class="nav-link {% if active_page == 'migration' %}active{% endif %}" id="nav-migration">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg>
+          Migration Certificate
+        </a>
+      </nav>
+
+      <div class="sidebar-footer">
+        <a href="{{ url_for('student_logout') }}" class="nav-link" id="nav-logout">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+          Logout
+        </a>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="portal-main">
+      <!-- Flash Messages -->
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+          <div class="portal-flash">
+            {% for category, message in messages %}
+              <div class="flash-msg flash-{{ category }}">{{ message }}</div>
+            {% endfor %}
+          </div>
+        {% endif %}
+      {% endwith %}
+
+      {% block content %}{% endblock %}
+    </main>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+  <script>
+    // Sidebar toggle for mobile
+    const toggle = document.getElementById('sidebar-toggle');
+    const sidebar = document.getElementById('portal-sidebar');
+    if (toggle && sidebar) {
+      toggle.addEventListener('click', () => sidebar.classList.toggle('open'));
+      document.addEventListener('click', (e) => {
+        if (sidebar.classList.contains('open') && !sidebar.contains(e.target) && e.target !== toggle) {
+          sidebar.classList.remove('open');
+        }
+      });
+    }
+    // Auto-hide flash
+    setTimeout(() => {
+      document.querySelectorAll('.portal-flash .flash-msg').forEach(el => {
+        el.style.transition = 'opacity 0.5s ease';
+        el.style.opacity = '0';
+        setTimeout(() => el.remove(), 500);
+      });
+    }, 4000);
+  </script>
+</body>
+</html>

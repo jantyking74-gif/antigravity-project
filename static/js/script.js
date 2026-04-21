@@ -392,7 +392,7 @@
           btnText.textContent = '✓ Welcome!';
           btn.style.animation = 'successPulse 0.6s ease';
           setTimeout(() => {
-            window.location.href = '/my-result';
+            window.location.href = '/student/dashboard';
           }, 1000);
         } else {
           btn.disabled = false;

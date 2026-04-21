@@ -1,0 +1,89 @@
+{% extends 'student_portal_base.html' %}
+{% block title %}EduTrackX — Dashboard{% endblock %}
+
+{% block content %}
+<div class="portal-header">
+  <div>
+    <h1>Welcome back, {{ student.name.split(' ')[0] }} 👋</h1>
+    <p>Here's an overview of your academic journey</p>
+  </div>
+</div>
+
+<!-- Stats -->
+<div class="stats-grid">
+  <div class="portal-card" style="animation-delay: 0.1s;">
+    <div class="card-icon-box" style="background: rgba(0,198,255,0.12);">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#00c6ff" stroke-width="2" stroke-linecap="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+    </div>
+    <h3>Current Semester</h3>
+    <p class="card-value">Semester {{ current_semester }}</p>
+  </div>
+
+  <div class="portal-card" style="animation-delay: 0.2s;">
+    <div class="card-icon-box" style="background: rgba(0,255,200,0.12);">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#00ffc8" stroke-width="2" stroke-linecap="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+    </div>
+    <h3>Total Subjects</h3>
+    <p class="card-value">{{ total_subjects }}</p>
+  </div>
+
+  <div class="portal-card" style="animation-delay: 0.3s;">
+    <div class="card-icon-box" style="background: rgba(100,50,255,0.12);">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#6432ff" stroke-width="2" stroke-linecap="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+    </div>
+    <h3>Forms Submitted</h3>
+    <p class="card-value">{{ forms_count }}</p>
+  </div>
+
+  <div class="portal-card" style="animation-delay: 0.4s;">
+    <div class="card-icon-box" style="background: rgba(255,170,0,0.12);">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ffaa00" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+    </div>
+    <h3>Pending Actions</h3>
+    <p class="card-value">{{ pending_count }}</p>
+  </div>
+</div>
+
+<!-- Quick Actions -->
+<div class="content-grid">
+  <div class="portal-card">
+    <h3 style="margin-bottom: 20px; font-size: 16px; font-weight: 600; color: var(--text-secondary);">Quick Actions</h3>
+    <div style="display: flex; flex-direction: column; gap: 10px;">
+      <a href="{{ url_for('student_profile') }}" class="portal-btn btn-outline" style="justify-content: flex-start;">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        View Profile
+      </a>
+      <a href="{{ url_for('student_form_fillup') }}" class="portal-btn btn-outline" style="justify-content: flex-start;">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+        Fill Exam Form
+      </a>
+      <a href="{{ url_for('student_result_page') }}" class="portal-btn btn-outline" style="justify-content: flex-start;">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+        View Results
+      </a>
+    </div>
+  </div>
+
+  <div class="portal-card">
+    <h3 style="margin-bottom: 20px; font-size: 16px; font-weight: 600; color: var(--text-secondary);">Student Info</h3>
+    <div style="display: flex; flex-direction: column; gap: 14px;">
+      <div style="display: flex; justify-content: space-between;">
+        <span style="color: var(--text-muted); font-size: 13px;">Roll Number</span>
+        <span style="color: var(--text-primary); font-size: 13px; font-weight: 600;">{{ student.roll_no }}</span>
+      </div>
+      <div style="display: flex; justify-content: space-between;">
+        <span style="color: var(--text-muted); font-size: 13px;">Class</span>
+        <span style="color: var(--text-primary); font-size: 13px; font-weight: 600;">{{ student.class }}</span>
+      </div>
+      <div style="display: flex; justify-content: space-between;">
+        <span style="color: var(--text-muted); font-size: 13px;">Semester</span>
+        <span style="color: var(--text-primary); font-size: 13px; font-weight: 600;">{{ current_semester }}</span>
+      </div>
+      <div style="display: flex; justify-content: space-between;">
+        <span style="color: var(--text-muted); font-size: 13px;">Email</span>
+        <span style="color: var(--text-primary); font-size: 13px; font-weight: 600;">{{ student.email or 'Not set' }}</span>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
