@@ -60,6 +60,11 @@
 
   <!-- Summary -->
   {% if marks %}
+  <style>
+    .final-grade-box { border: 1px solid {{ grade[1] }}55 !important; }
+    .final-grade-fill { background-color: {{ grade[1] }} !important; }
+    .final-grade-value { color: {{ grade[1] }} !important; text-shadow: 0 0 10px {{ grade[1] }}88 !important; }
+  </style>
   <div style="display: flex; gap: 15px; margin-bottom: 30px; transform: translateZ(15px);">
     <div style="flex: 1; background: var(--input-bg); border: 1px solid var(--input-border); border-radius: var(--input-radius); padding: 15px; text-align: center;">
       <p style="color: var(--text-muted); font-size: 12px; margin-bottom: 5px;">Total Marks</p>
@@ -69,10 +74,10 @@
       <p style="color: var(--text-muted); font-size: 12px; margin-bottom: 5px;">Percentage</p>
       <p style="color: var(--text-primary); font-size: 20px; font-weight: 700;">{{ percentage }}%</p>
     </div>
-    <div style="flex: 1; background: rgba(255,255,255,0.02); border: 1px solid {{ grade[1] + '55' }}; border-radius: var(--input-radius); padding: 15px; text-align: center; position: relative; overflow: hidden;">
-      <div style="position: absolute; inset: 0; background-color: {{ grade[1] }}; opacity: 0.1;"></div>
+    <div class="final-grade-box" style="flex: 1; background: rgba(255,255,255,0.02); border-radius: var(--input-radius); padding: 15px; text-align: center; position: relative; overflow: hidden;">
+      <div class="final-grade-fill" style="position: absolute; inset: 0; opacity: 0.1;"></div>
       <p style="color: var(--text-muted); font-size: 12px; margin-bottom: 5px; position: relative; z-index: 1;">Final Grade</p>
-      <p style="color: {{ grade[1] }}; font-size: 24px; font-weight: 800; line-height: 1; position: relative; z-index: 1; text-shadow: 0 0 10px {{ grade[1] + '88' }};">{{ grade[0] }}</p>
+      <p class="final-grade-value" style="font-size: 24px; font-weight: 800; line-height: 1; position: relative; z-index: 1;">{{ grade[0] }}</p>
     </div>
   </div>
   {% endif %}
